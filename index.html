@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Theory Practice Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Music Theory Practice Hub</h1>
+        <p class="subtitle">Master scales, chords, and piano skills with interactive tools</p>
+        
+        <div class="cards-container">
+            <a href="practice.html" class="card">
+                <div class="card-icon">🎼</div>
+                <h2>Scale & Chord Practice</h2>
+                <p>Interactive music sheets displaying scales and chords on treble and bass clef. Perfect for visual learners and theory practice.</p>
+                <div class="features">
+                    <span class="feature-tag">Major/Minor Scales</span>
+                    <span class="feature-tag">Key Signatures</span>
+                    <span class="feature-tag">Chord Progressions</span>
+                    <span class="feature-tag">Staff Notation</span>
+                </div>
+            </a>
+            
+            <a href="piano.html" class="card">
+                <div class="card-icon">🎹</div>
+                <h2>Interactive Piano</h2>
+                <p>Play a virtual piano with sound, see note names, practice chords, and learn key relationships on a familiar keyboard layout.</p>
+                <div class="features">
+                    <span class="feature-tag">Virtual Piano</span>
+                    <span class="feature-tag">Note Display</span>
+                    <span class="feature-tag">Chord Helper</span>
+                    <span class="feature-tag">Sound Playback</span>
+                </div>
+            </a>
+        </div>
+        
+        <div style="margin-top: 3rem; opacity: 0.7;">
+            <p>🎯 Educational • 🚀 No Sign-up Required • 📱 Mobile Friendly</p>
+        </div>
+    </div>
+</body>
+</html>
