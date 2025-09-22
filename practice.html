@@ -338,22 +338,6 @@
             'Ab-minor': { sharps: 0, flats: 7, notes: ['A♭', 'B♭', 'C♭', 'D♭', 'E♭', 'F♭', 'G♭'] }
         };
 
-        // Enhanced note mapping with enharmonic equivalents
-        const enharmonicMap = {
-            'C': ['C', 'B♯'],
-            'C#': ['C♯', 'D♭'],
-            'D': ['D'],
-            'D#': ['D♯', 'E♭'],
-            'E': ['E', 'F♭'],
-            'F': ['F', 'E♯'],
-            'F#': ['F♯', 'G♭'],
-            'G': ['G'],
-            'G#': ['G♯', 'A♭'],
-            'A': ['A'],
-            'A#': ['A♯', 'B♭'],
-            'B': ['B', 'C♭']
-        };
-
         // Define note positions for each staff
         const trebleNotes = [
             { note: 'C', octave: 4, position: 150 },  
@@ -427,17 +411,6 @@
             return keySignatures[keyString] || keySignatures['C-major'];
         }
 
-        function getCorrectNoteName(noteBaseName, keySignature) {
-            // Find the correct enharmonic spelling based on the scale
-            for (let scaleNote of keySignature.notes) {
-                const baseNote = scaleNote.replace(/[♯♭]/g, '');
-                if (baseNote === noteBaseName) {
-                    return scaleNote;
-                }
-            }
-            return noteBaseName;
-        }
-
         function clearStaff() {
             document.querySelectorAll('.note').forEach(note => note.remove());
         }
@@ -475,26 +448,30 @@
             const scaleNotes = keySignature.notes;
             
             if (displayMode === 'scale') {
-                let trebleXPosition = 100; 
-                let bassXPosition = 100;   
-                const spacing = 50;
+                // *** FIXED: Create a position map for each scale note ***
+                const spacing = 100; // Increased spacing for better alignment
+                const startPosition = 100;
                 
-                // Display notes in proper order with correct enharmonic spelling
+                // Create position mappings for each scale note
+                const notePositions = {};
+                scaleNotes.forEach((scaleName, index) => {
+                    notePositions[scaleName] = startPosition + (index * spacing);
+                });
+                
+                // Place all notes with the same letter name at the same X position
                 scaleNotes.forEach((scaleName) => {
                     const baseName = scaleName.replace(/[♯♭]/g, '');
+                    const xPosition = notePositions[scaleName];
                     
-                    // Treble staff
+                    // Place ALL occurrences of this note name at the SAME X position
                     const trebleMatches = findNoteData(trebleNotes, scaleName);
                     trebleMatches.forEach((noteData) => {
-                        addNoteToStaff('treble', scaleName, noteData.octave, noteData.position, trebleXPosition);
-                        trebleXPosition += spacing;
+                        addNoteToStaff('treble', scaleName, noteData.octave, noteData.position, xPosition);
                     });
                     
-                    // Bass staff
                     const bassMatches = findNoteData(bassNotes, scaleName);
                     bassMatches.forEach((noteData) => {
-                        addNoteToStaff('bass', scaleName, noteData.octave, noteData.position, bassXPosition);
-                        bassXPosition += spacing;
+                        addNoteToStaff('bass', scaleName, noteData.octave, noteData.position, xPosition);
                     });
                 });
                 
@@ -503,9 +480,8 @@
                 const chordType = displayMode === 'triads' ? 'triads' : 'sevenths';
                 const chords = chordPatterns[chordType];
                 
-                let trebleXPosition = 100;
-                let bassXPosition = 100;
-                const chordSpacing = 100;
+                let xPosition = 100;
+                const chordSpacing = 120;
                 
                 chords.forEach((chord) => {
                     const chordNotes = chord.degrees.map(degree => scaleNotes[degree]);
@@ -515,7 +491,7 @@
                         if (trebleMatches.length > 0) {
                             const noteData = trebleMatches[Math.floor(trebleMatches.length / 2)];
                             const stackedPosition = noteData.position - (noteIndex * 15);
-                            addNoteToStaff('treble', chordNote, noteData.octave, stackedPosition, trebleXPosition, true);
+                            addNoteToStaff('treble', chordNote, noteData.octave, stackedPosition, xPosition, true);
                         }
                     });
                     
@@ -524,12 +500,11 @@
                         if (bassMatches.length > 0) {
                             const noteData = bassMatches[Math.floor(bassMatches.length / 2)];
                             const stackedPosition = noteData.position - (noteIndex * 15);
-                            addNoteToStaff('bass', chordNote, noteData.octave, stackedPosition, bassXPosition, true);
+                            addNoteToStaff('bass', chordNote, noteData.octave, stackedPosition, xPosition, true);
                         }
                     });
                     
-                    trebleXPosition += chordSpacing;
-                    bassXPosition += chordSpacing;
+                    xPosition += chordSpacing;
                 });
             }
             
@@ -562,8 +537,9 @@
             
             if (displayMode === 'scale') {
                 chordInfo.innerHTML = `
-                    <strong>Proper enharmonic spelling displayed:</strong><br>
-                    Notes use correct ♯ and ♭ symbols based on key signature<br>
+                    <strong>Perfect vertical alignment:</strong><br>
+                    All notes with the same letter name align vertically<br>
+                    Scale sequence starts from leftmost position<br>
                     Traditional music theory notation standards applied
                 `;
             } else {
