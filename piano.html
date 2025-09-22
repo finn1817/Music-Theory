@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Piano - Music Theory Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        select, button {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .piano-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .piano {
+            display: flex;
+            position: relative;
+            margin: 0 auto;
+            width: fit-content;
+            min-width: 700px;
+        }
+
+        .white-key {
+            width: 50px;
+            height: 200px;
+            background: white;
+            border: 2px solid #333;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .white-key:hover {
+            background: #f0f0f0;
+        }
+
+        .white-key.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .black-key {
+            width: 30px;
+            height: 120px;
+            background: #333;
+            position: absolute;
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: white;
+        }
+
+        .black-key:hover {
+            background: #555;
+        }
+
+        .black-key.active {
+            background: #667eea;
+        }
+
+        .key-label {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chord-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .note-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .piano-container {
+                padding: 1rem;
+            }
+            
+            .piano {
+                min-width: 500px;
+            }
+            
+            .white-key {
+                width: 35px;
+                height: 150px;
+            }
+            
+            .black-key {
+                width: 20px;
+                height: 90px;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Hub</a>
+    
+    <div class="header">
+        <h1>🎹 Interactive Piano</h1>
+        <p>Play, learn, and practice with sound and visual feedback</p>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="chordType">Chord Helper:</label>
+            <select id="chordType">
+                <option value="">Select a chord type</option>
+                <option value="major">Major Triad</option>
+                <option value="minor">Minor Triad</option>
+                <option value="diminished">Diminished Triad</option>
+                <option value="augmented">Augmented Triad</option>
+                <option value="major7">Major 7th</option>
+                <option value="minor7">Minor 7th</option>
+                <option value="dominant7">Dominant 7th</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="chordRoot">Chord Root:</label>
+            <select id="chordRoot">
+                <option value="C">C</option>
+                <option value="C#">C#</option>
+                <option value="D">D</option>
+                <option value="D#">D#</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="F#">F#</option>
+                <option value="G">G</option>
+                <option value="G#">G#</option>
+                <option value="A">A</option>
+                <option value="A#">A#</option>
+                <option value="B">B</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>&nbsp;</label>
+            <button onclick="showChord()">Show Chord</button>
+        </div>
+        
+        <div class="control-group">
+            <label>&nbsp;</label>
+            <button onclick="clearHighlights()">Clear All</button>
+        </div>
+    </div>
+
+    <div class="piano-container">
+        <div class="piano" id="piano">
+            <!-- Piano keys will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div class="note-info">
+            <h3>🎵 Note Information</h3>
+            <div id="noteDisplay">Click a key to see note information</div>
+        </div>
+        
+        <div class="chord-display">
+            <h3>🎼 Chord Information</h3>
+            <div id="chordDisplay">Use the chord helper to see chord patterns</div>
+        </div>
+    </div>
+
+    <script>
+        let audioContext;
+        const activeNotes = new Set();
+
+        // Initialize audio context
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // Note frequencies (4th octave)
+        const noteFrequencies = {
+            'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13,
+            'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
+            'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
+        };
+
+        // Chord patterns (semitones from root)
+        const chordPatterns = {
+            'major': [0, 4, 7],
+            'minor': [0, 3, 7],
+            'diminished': [0, 3, 6],
+            'augmented': [0, 4, 8],
+            'major7': [0, 4, 7, 11],
+            'minor7': [0, 3, 7, 10],
+            'dominant7': [0, 4, 7, 10]
+        };
+
+        function playNote(note) {
+            if (!audioContext) initAudio();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(noteFrequencies[note], audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 1);
+        }
+
+        function createPiano() {
+            const piano = document.getElementById('piano');
+            const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+            const blackKeys = [null, 'C#', null, 'D#', null, null, 'F#', null, 'G#', null, 'A#', null];
+            
+            // Create white keys
+            whiteKeys.forEach((note, index) => {
+                const key = document.createElement('div');
+                key.className = 'white-key';
+                key.dataset.note = note;
+                key.innerHTML = `<span class="key-label">${note}</span>`;
+                
+                key.addEventListener('mousedown', () => {
+                    if (!audioContext) initAudio();
+                    playNote(note);
+                    key.classList.add('active');
+                    updateNoteInfo(note);
+                });
+                
+                key.addEventListener('mouseup', () => {
+                    key.classList.remove('active');
+                });
+                
+                key.addEventListener('mouseleave', () => {
+                    key.classList.remove('active');
+                });
+                
+                piano.appendChild(key);
+            });
+            
+            // Create black keys
+            blackKeys.forEach((note, index) => {
+                if (note) {
+                    const key = document.createElement('div');
+                    key.className = 'black-key';
+                    key.dataset.note = note;
+                    key.innerHTML = `<span class="key-label">${note}</span>`;
+                    key.style.left = (index * 50 + 35) + 'px';
+                    
+                    key.addEventListener('mousedown', () => {
+                        if (!audioContext) initAudio();
+                        playNote(note);
+                        key.classList.add('active');
+                        updateNoteInfo(note);
+                    });
+                    
+                    key.addEventListener('mouseup', () => {
+                        key.classList.remove('active');
+                    });
+                    
+                    key.addEventListener('mouseleave', () => {
+                        key.classList.remove('active');
+                    });
+                    
+                    piano.appendChild(key);
+                }
+            });
+        }
+
+        function updateNoteInfo(note) {
+            const noteDisplay = document.getElementById('noteDisplay');
+            const frequency = noteFrequencies[note];
+            
+            noteDisplay.innerHTML = `
+                <strong>Note:</strong> ${note}<br>
+                <strong>Frequency:</strong> ${frequency.toFixed(2)} Hz<br>
+                <strong>Position:</strong> ${note.includes('#') ? 'Black key' : 'White key'}
+            `;
+        }
+
+        function showChord() {
+            const chordType = document.getElementById('chordType').value;
+            const chordRoot = document.getElementById('chordRoot').value;
+            
+            if (!chordType || !chordRoot) return;
+            
+            clearHighlights();
+            
+            const pattern = chordPatterns[chordType];
+            const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const rootIndex = notes.indexOf(chordRoot);
+            
+            const chordNotes = pattern.map(interval => notes[(rootIndex + interval) % 12]);
+            
+            // Highlight chord notes
+            chordNotes.forEach(note => {
+                const key = document.querySelector(`[data-note="${note}"]`);
+                if (key) {
+                    key.style.background = key.classList.contains('black-key') ? '#667eea' : '#667eea';
+                    key.style.color = 'white';
+                }
+            });
+            
+            // Update chord display
+            const chordDisplay = document.getElementById('chordDisplay');
+            chordDisplay.innerHTML = `
+                <strong>Chord:</strong> ${chordRoot} ${chordType}<br>
+                <strong>Notes:</strong> ${chordNotes.join(' - ')}<br>
+                <strong>Pattern:</strong> ${pattern.join(' - ')} (semitones from root)
+            `;
+        }
+
+        function clearHighlights() {
+            const keys = document.querySelectorAll('.white-key, .black-key');
+            keys.forEach(key => {
+                if (key.classList.contains('black-key')) {
+                    key.style.background = '#333';
+                    key.style.color = 'white';
+                } else {
+                    key.style.background = 'white';
+                    key.style.color = 'black';
+                }
+            });
+            
+            document.getElementById('chordDisplay').innerHTML = 'Use the chord helper to see chord patterns';
+        }
+
+        // Initialize piano on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            createPiano();
+        });
+
+        // Enable audio context on first user interaction
+        document.addEventListener('click', () => {
+            if (!audioContext) initAudio();
+        }, { once: true });
+    </script>
+</body>
+</html>
