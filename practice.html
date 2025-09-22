@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scale & Chord Practice - Music Theory Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        select, button {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, button:focus {
+            outline: 2px solid #fff;
+            background: white;
+        }
+
+        button:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .staff-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .staff {
+            position: relative;
+            height: 120px;
+            margin: 2rem 0;
+            border-left: 3px solid #333;
+        }
+
+        .staff-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #333;
+        }
+
+        .clef {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .note {
+            position: absolute;
+            width: 20px;
+            height: 15px;
+            background: #333;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note:hover {
+            background: #667eea;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .note-name {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .key-signature {
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .chord-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .staff-container {
+                padding: 1rem;
+            }
+            
+            .staff {
+                height: 100px;
+            }
+            
+            .clef {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Hub</a>
+    
+    <div class="header">
+        <h1>🎼 Scale & Chord Practice</h1>
+        <p>Interactive music theory with visual staff notation</p>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="scaleType">Scale Type:</label>
+            <select id="scaleType">
+                <option value="major">Major Scale</option>
+                <option value="minor">Natural Minor Scale</option>
+                <option value="harmonic-minor">Harmonic Minor Scale</option>
+                <option value="melodic-minor">Melodic Minor Scale</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="rootNote">Root Note:</label>
+            <select id="rootNote">
+                <option value="C">C</option>
+                <option value="C#">C#/Db</option>
+                <option value="D">D</option>
+                <option value="D#">D#/Eb</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="F#">F#/Gb</option>
+                <option value="G">G</option>
+                <option value="G#">G#/Ab</option>
+                <option value="A">A</option>
+                <option value="A#">A#/Bb</option>
+                <option value="B">B</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="displayMode">Display Mode:</label>
+            <select id="displayMode">
+                <option value="scale">Scale Notes</option>
+                <option value="triads">Basic Triads</option>
+                <option value="sevenths">Seventh Chords</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>&nbsp;</label>
+            <button onclick="generateScale()">Generate</button>
+        </div>
+    </div>
+
+    <div class="staff-container">
+        <h3 style="color: #333; margin-bottom: 1rem;">Treble Clef</h3>
+        <div class="staff" id="trebleStaff">
+            <div class="clef">𝄞</div>
+            <div class="staff-line" style="top: 0%"></div>
+            <div class="staff-line" style="top: 25%"></div>
+            <div class="staff-line" style="top: 50%"></div>
+            <div class="staff-line" style="top: 75%"></div>
+            <div class="staff-line" style="top: 100%"></div>
+        </div>
+        
+        <h3 style="color: #333; margin-bottom: 1rem; margin-top: 3rem;">Bass Clef</h3>
+        <div class="staff" id="bassStaff">
+            <div class="clef">𝄢</div>
+            <div class="staff-line" style="top: 0%"></div>
+            <div class="staff-line" style="top: 25%"></div>
+            <div class="staff-line" style="top: 50%"></div>
+            <div class="staff-line" style="top: 75%"></div>
+            <div class="staff-line" style="top: 100%"></div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <h3>Scale Information</h3>
+        <div class="key-signature" id="keySignature">Select a scale to see key signature and interval information</div>
+        <div class="chord-info" id="chordInfo"></div>
+    </div>
+
+    <script>
+        const notePositions = {
+            treble: {
+                'C4': 87.5, 'D4': 81.25, 'E4': 75, 'F4': 68.75, 'G4': 62.5, 'A4': 56.25, 'B4': 50,
+                'C5': 43.75, 'D5': 37.5, 'E5': 31.25, 'F5': 25, 'G5': 18.75, 'A5': 12.5, 'B5': 6.25,
+                'C6': 0, 'C3': 100, 'D3': 93.75, 'E3': 87.5, 'F3': 81.25, 'G3': 75, 'A3': 68.75, 'B3': 62.5
+            },
+            bass: {
+                'C2': 87.5, 'D2': 81.25, 'E2': 75, 'F2': 68.75, 'G2': 62.5, 'A2': 56.25, 'B2': 50,
+                'C3': 43.75, 'D3': 37.5, 'E3': 31.25, 'F3': 25, 'G3': 18.75, 'A3': 12.5, 'B3': 6.25,
+                'C4': 0, 'C1': 100, 'D1': 93.75, 'E1': 87.5, 'F1': 81.25, 'G1': 75, 'A1': 68.75, 'B1': 62.5
+            }
+        };
+
+        const scalePatterns = {
+            'major': [0, 2, 4, 5, 7, 9, 11],
+            'minor': [0, 2, 3, 5, 7, 8, 10],
+            'harmonic-minor': [0, 2, 3, 5, 7, 8, 11],
+            'melodic-minor': [0, 2, 3, 5, 7, 9, 11]
+        };
+
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        
+        function getNoteFromSemitone(rootIndex, semitone) {
+            return noteNames[(rootIndex + semitone) % 12];
+        }
+
+        function clearStaff(staffId) {
+            const staff = document.getElementById(staffId);
+            const notes = staff.querySelectorAll('.note');
+            notes.forEach(note => note.remove());
+        }
+
+        function addNoteToStaff(staffId, noteName, octave, position) {
+            const staff = document.getElementById(staffId);
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.style.top = position + '%';
+            note.style.left = (80 + position * 8) + 'px';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'note-name';
+            nameDiv.textContent = noteName;
+            note.appendChild(nameDiv);
+            
+            staff.appendChild(note);
+        }
+
+        function generateScale() {
+            const scaleType = document.getElementById('scaleType').value;
+            const rootNote = document.getElementById('rootNote').value;
+            const displayMode = document.getElementById('displayMode').value;
+            
+            clearStaff('trebleStaff');
+            clearStaff('bassStaff');
+            
+            const rootIndex = noteNames.indexOf(rootNote.replace('#', '#').replace('b', '#'));
+            const pattern = scalePatterns[scaleType];
+            
+            // Generate scale notes
+            const scaleNotes = pattern.map(semitone => getNoteFromSemitone(rootIndex, semitone));
+            
+            if (displayMode === 'scale') {
+                // Display scale notes
+                scaleNotes.forEach((note, index) => {
+                    // Treble clef (octave 4-5)
+                    const trebleOctave = index < 4 ? 4 : 5;
+                    const trebleKey = note + trebleOctave;
+                    if (notePositions.treble[trebleKey]) {
+                        addNoteToStaff('trebleStaff', note, trebleOctave, notePositions.treble[trebleKey]);
+                    }
+                    
+                    // Bass clef (octave 2-3)
+                    const bassOctave = index < 4 ? 2 : 3;
+                    const bassKey = note + bassOctave;
+                    if (notePositions.bass[bassKey]) {
+                        addNoteToStaff('bassStaff', note, bassOctave, notePositions.bass[bassKey]);
+                    }
+                });
+            }
+            
+            updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode);
+        }
+
+        function updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode) {
+            const keySignature = document.getElementById('keySignature');
+            const chordInfo = document.getElementById('chordInfo');
+            
+            const scaleInfo = {
+                'major': 'Major scale pattern: W-W-H-W-W-W-H',
+                'minor': 'Natural minor pattern: W-H-W-W-H-W-W',
+                'harmonic-minor': 'Harmonic minor pattern: W-H-W-W-H-W+H-H',
+                'melodic-minor': 'Melodic minor pattern: W-H-W-W-W-W-H'
+            };
+            
+            keySignature.innerHTML = `
+                <strong>${rootNote} ${scaleType.replace('-', ' ').toUpperCase()}</strong><br>
+                Notes: ${scaleNotes.join(' - ')}<br>
+                ${scaleInfo[scaleType]}
+            `;
+            
+            if (displayMode === 'scale') {
+                chordInfo.innerHTML = `
+                    <strong>Scale Degrees:</strong><br>
+                    I: ${scaleNotes[0]} (Tonic)<br>
+                    II: ${scaleNotes[1]} (Supertonic)<br>
+                    III: ${scaleNotes[2]} (Mediant)<br>
+                    IV: ${scaleNotes[3]} (Subdominant)<br>
+                    V: ${scaleNotes[4]} (Dominant)<br>
+                    VI: ${scaleNotes[5]} (Submediant)<br>
+                    VII: ${scaleNotes[6]} (Leading Tone)
+                `;
+            }
+        }
+
+        // Initialize with C Major
+        generateScale();
+    </script>
+</body>
+</html>
