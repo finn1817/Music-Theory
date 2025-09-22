@@ -173,6 +173,10 @@
             white-space: nowrap;
         }
 
+        .chord-note {
+            background: #667eea;
+        }
+
         .info-panel {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -339,16 +343,38 @@
             'melodic-minor': [0, 2, 3, 5, 7, 9, 11]
         };
 
+        // Chord patterns based on scale degrees
+        const chordPatterns = {
+            'triads': [
+                { name: 'I', degrees: [0, 2, 4] },      // 1st, 3rd, 5th
+                { name: 'ii', degrees: [1, 3, 5] },     // 2nd, 4th, 6th
+                { name: 'iii', degrees: [2, 4, 6] },    // 3rd, 5th, 7th
+                { name: 'IV', degrees: [3, 5, 0] },     // 4th, 6th, 1st
+                { name: 'V', degrees: [4, 6, 1] },      // 5th, 7th, 2nd
+                { name: 'vi', degrees: [5, 0, 2] },     // 6th, 1st, 3rd
+                { name: 'vii°', degrees: [6, 1, 3] }    // 7th, 2nd, 4th
+            ],
+            'sevenths': [
+                { name: 'IMaj7', degrees: [0, 2, 4, 6] },   // 1st, 3rd, 5th, 7th
+                { name: 'ii7', degrees: [1, 3, 5, 0] },     // 2nd, 4th, 6th, 1st
+                { name: 'iii7', degrees: [2, 4, 6, 1] },    // 3rd, 5th, 7th, 2nd
+                { name: 'IVMaj7', degrees: [3, 5, 0, 2] },  // 4th, 6th, 1st, 3rd
+                { name: 'V7', degrees: [4, 6, 1, 3] },      // 5th, 7th, 2nd, 4th
+                { name: 'vi7', degrees: [5, 0, 2, 4] },     // 6th, 1st, 3rd, 5th
+                { name: 'vii°7', degrees: [6, 1, 3, 5] }    // 7th, 2nd, 4th, 6th
+            ]
+        };
+
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
         function clearStaff() {
             document.querySelectorAll('.note').forEach(note => note.remove());
         }
 
-        function addNoteToStaff(staffName, noteName, octave, position, xPosition) {
+        function addNoteToStaff(staffName, noteName, octave, position, xPosition, isChord = false) {
             const staff = document.getElementById(staffName + 'Staff');
             const note = document.createElement('div');
-            note.className = 'note';
+            note.className = isChord ? 'note chord-note' : 'note';
             
             note.style.top = (40 + position) + 'px';
             note.style.left = xPosition + 'px';
@@ -361,9 +387,14 @@
             staff.appendChild(note);
         }
 
+        function findNoteData(noteArray, noteName) {
+            return noteArray.filter(n => n.note === noteName);
+        }
+
         function generateScale() {
             const scaleType = document.getElementById('scaleType').value;
             const rootNote = document.getElementById('rootNote').value.replace('b', '#');
+            const displayMode = document.getElementById('displayMode').value;
             
             clearStaff();
             
@@ -371,30 +402,69 @@
             const pattern = scalePatterns[scaleType];
             const scaleNotes = pattern.map(semitone => noteNames[(rootIndex + semitone) % 12]);
             
-            let trebleXPosition = 100; // Starting position for treble
-            let bassXPosition = 100;   // Starting position for bass
-            const spacing = 50;
+            if (displayMode === 'scale') {
+                // KEEP THE EXISTING SCALE FUNCTIONALITY EXACTLY AS IS
+                let trebleXPosition = 100; 
+                let bassXPosition = 100;   
+                const spacing = 50;
+                
+                trebleNotes.forEach((noteData) => {
+                    if (scaleNotes.includes(noteData.note)) {
+                        addNoteToStaff('treble', noteData.note, noteData.octave, noteData.position, trebleXPosition);
+                        trebleXPosition += spacing;
+                    }
+                });
+                
+                bassNotes.forEach((noteData) => {
+                    if (scaleNotes.includes(noteData.note)) {
+                        addNoteToStaff('bass', noteData.note, noteData.octave, noteData.position, bassXPosition);
+                        bassXPosition += spacing;
+                    }
+                });
+                
+            } else {
+                // NEW CHORD FUNCTIONALITY
+                const chordType = displayMode === 'triads' ? 'triads' : 'sevenths';
+                const chords = chordPatterns[chordType];
+                
+                let trebleXPosition = 100;
+                let bassXPosition = 100;
+                const chordSpacing = 100; // Space between chords
+                
+                chords.forEach((chord) => {
+                    const chordNotes = chord.degrees.map(degree => scaleNotes[degree]);
+                    
+                    // Stack chord notes vertically in treble
+                    chordNotes.forEach((chordNote, noteIndex) => {
+                        const trebleMatches = findNoteData(trebleNotes, chordNote);
+                        if (trebleMatches.length > 0) {
+                            // Use middle octave for chord display
+                            const noteData = trebleMatches[Math.floor(trebleMatches.length / 2)];
+                            const stackedPosition = noteData.position - (noteIndex * 15); // Stack vertically
+                            addNoteToStaff('treble', noteData.note, noteData.octave, stackedPosition, trebleXPosition, true);
+                        }
+                    });
+                    
+                    // Stack chord notes vertically in bass
+                    chordNotes.forEach((chordNote, noteIndex) => {
+                        const bassMatches = findNoteData(bassNotes, chordNote);
+                        if (bassMatches.length > 0) {
+                            // Use middle octave for chord display
+                            const noteData = bassMatches[Math.floor(bassMatches.length / 2)];
+                            const stackedPosition = noteData.position - (noteIndex * 15); // Stack vertically
+                            addNoteToStaff('bass', noteData.note, noteData.octave, stackedPosition, bassXPosition, true);
+                        }
+                    });
+                    
+                    trebleXPosition += chordSpacing;
+                    bassXPosition += chordSpacing;
+                });
+            }
             
-            // Process treble clef - start from left
-            trebleNotes.forEach((noteData) => {
-                if (scaleNotes.includes(noteData.note)) {
-                    addNoteToStaff('treble', noteData.note, noteData.octave, noteData.position, trebleXPosition);
-                    trebleXPosition += spacing;
-                }
-            });
-            
-            // Process bass clef - start from left
-            bassNotes.forEach((noteData) => {
-                if (scaleNotes.includes(noteData.note)) {
-                    addNoteToStaff('bass', noteData.note, noteData.octave, noteData.position, bassXPosition);
-                    bassXPosition += spacing;
-                }
-            });
-            
-            updateInfoPanel(rootNote, scaleType, scaleNotes);
+            updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode);
         }
 
-        function updateInfoPanel(rootNote, scaleType, scaleNotes) {
+        function updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode) {
             const keySignature = document.getElementById('keySignature');
             const chordInfo = document.getElementById('chordInfo');
             
@@ -411,12 +481,22 @@
                 ${scaleInfo[scaleType]}
             `;
             
-            chordInfo.innerHTML = `
-                <strong>Both staves show scale notes independently:</strong><br>
-                Treble: All scale notes in treble range (C4-C6)<br>
-                Bass: All scale notes in bass range (C2-C4)<br>
-                Each staff starts from the left with its own sequence.
-            `;
+            if (displayMode === 'scale') {
+                chordInfo.innerHTML = `
+                    <strong>Both staves show scale notes independently:</strong><br>
+                    Treble: All scale notes in treble range (C4-C6)<br>
+                    Bass: All scale notes in bass range (C2-C4)<br>
+                    Each staff starts from the left with its own sequence.
+                `;
+            } else {
+                const chordType = displayMode === 'triads' ? 'Basic Triads' : 'Seventh Chords';
+                const chords = chordPatterns[displayMode];
+                chordInfo.innerHTML = `
+                    <strong>${chordType} in ${rootNote} ${scaleType}:</strong><br>
+                    ${chords.map(chord => chord.name).join(' - ')}<br>
+                    Chords are stacked vertically in traditional notation.
+                `;
+            }
         }
 
         // Initialize
