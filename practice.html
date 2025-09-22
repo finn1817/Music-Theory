@@ -95,28 +95,35 @@
         .grand-staff {
             position: relative;
             width: 100%;
-            min-width: 800px;
-        }
-
-        .treble-staff, .bass-staff {
-            position: relative;
-            height: 160px;
-            margin: 1rem 0;
+            min-width: 1000px;
+            height: 500px;
         }
 
         .treble-staff {
-            margin-bottom: 3rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+        }
+
+        .bass-staff {
+            position: absolute;
+            top: 280px;
+            left: 0;
+            right: 0;
+            height: 200px;
         }
 
         .staff-lines {
             position: absolute;
-            left: 60px;
+            left: 80px;
             right: 20px;
-            top: 20px;
+            top: 40px;
             height: 120px;
         }
 
-        .staff-line {
+        .staff-line, .ledger-line {
             position: absolute;
             left: 0;
             right: 0;
@@ -125,27 +132,24 @@
         }
 
         .ledger-line {
-            position: absolute;
-            height: 2px;
-            width: 40px;
-            background: #333;
-            left: 60px;
+            background: #666;
         }
 
         .clef {
             position: absolute;
-            left: 10px;
-            top: 20px;
+            left: 20px;
+            top: 40px;
             font-size: 4rem;
             color: #333;
             font-weight: bold;
             line-height: 1;
+            z-index: 5;
         }
 
         .note {
             position: absolute;
-            width: 16px;
-            height: 12px;
+            width: 14px;
+            height: 10px;
             background: #333;
             border-radius: 50%;
             cursor: pointer;
@@ -155,12 +159,12 @@
 
         .note:hover {
             background: #667eea;
-            transform: scale(1.2);
+            transform: scale(1.3);
         }
 
         .note-name {
             position: absolute;
-            bottom: -20px;
+            bottom: -18px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 0.7rem;
@@ -203,7 +207,7 @@
             }
             
             .grand-staff {
-                min-width: 600px;
+                min-width: 800px;
             }
             
             .clef {
@@ -265,37 +269,43 @@
     </div>
 
     <div class="staff-container">
-        <div class="grand-staff">
+        <div class="grand-staff" id="grandStaff">
             <!-- Treble Staff -->
-            <div class="treble-staff">
+            <div class="treble-staff" id="trebleStaff">
                 <div class="clef">𝄞</div>
                 <div class="staff-lines">
+                    <!-- Main staff lines -->
                     <div class="staff-line" style="top: 0px;"></div>
                     <div class="staff-line" style="top: 30px;"></div>
                     <div class="staff-line" style="top: 60px;"></div>
                     <div class="staff-line" style="top: 90px;"></div>
                     <div class="staff-line" style="top: 120px;"></div>
+                    <!-- Ledger lines above -->
+                    <div class="ledger-line" style="top: -60px;"></div>
+                    <div class="ledger-line" style="top: -30px;"></div>
+                    <!-- Ledger lines below -->
+                    <div class="ledger-line" style="top: 150px;"></div>
+                    <div class="ledger-line" style="top: 180px;"></div>
                 </div>
-                <!-- Ledger lines will be added dynamically -->
-                <div class="ledger-line" style="top: 150px;" id="treble-ledger-c4"></div>
-                <div class="ledger-line" style="top: -30px;" id="treble-ledger-a5"></div>
-                <div class="ledger-line" style="top: -60px;" id="treble-ledger-c6"></div>
             </div>
 
             <!-- Bass Staff -->
-            <div class="bass-staff">
+            <div class="bass-staff" id="bassStaff">
                 <div class="clef">𝄢</div>
                 <div class="staff-lines">
+                    <!-- Ledger lines above -->
+                    <div class="ledger-line" style="top: -60px;"></div>
+                    <div class="ledger-line" style="top: -30px;"></div>
+                    <!-- Main staff lines -->
                     <div class="staff-line" style="top: 0px;"></div>
                     <div class="staff-line" style="top: 30px;"></div>
                     <div class="staff-line" style="top: 60px;"></div>
                     <div class="staff-line" style="top: 90px;"></div>
                     <div class="staff-line" style="top: 120px;"></div>
+                    <!-- Ledger lines below -->
+                    <div class="ledger-line" style="top: 150px;"></div>
+                    <div class="ledger-line" style="top: 180px;"></div>
                 </div>
-                <!-- Ledger lines will be added dynamically -->
-                <div class="ledger-line" style="top: -30px;" id="bass-ledger-c4"></div>
-                <div class="ledger-line" style="top: 150px;" id="bass-ledger-a2"></div>
-                <div class="ledger-line" style="top: 180px;" id="bass-ledger-f2"></div>
             </div>
         </div>
     </div>
@@ -307,24 +317,23 @@
     </div>
 
     <script>
-        // Note positions on staff (distance from top of staff lines in pixels)
-        // Each staff line is 30px apart, spaces are 15px between lines
+        // Complete note positions from bottom to top (in pixels from top of staff area)
         const notePositions = {
             treble: {
                 // Ledger lines above staff
                 'C6': -60, 'B5': -45, 'A5': -30, 'G5': -15,
-                // Staff lines and spaces (top to bottom)
-                'F5': 0,   'E5': 15,  'D5': 30,  'C5': 45,  'B4': 60,  'A4': 75,  'G4': 90,  'F4': 105, 'E4': 120,
+                // Main staff (F5 on top line to E4 on bottom line)
+                'F5': 0, 'E5': 15, 'D5': 30, 'C5': 45, 'B4': 60, 'A4': 75, 'G4': 90, 'F4': 105, 'E4': 120,
                 // Ledger lines below staff
-                'D4': 135, 'C4': 150, 'B3': 165
+                'D4': 135, 'C4': 150, 'B3': 165, 'A3': 180
             },
             bass: {
-                // Ledger lines above staff
-                'A3': -15, 'G3': 0,   'F3': 15,  'E3': 30,  'D3': 45,  'C3': 60,  'B2': 75,  'A2': 90,  'G2': 105, 'F2': 120,
-                // Staff lines and spaces (top to bottom)
-                'E2': 135, 'D2': 150, 'C2': 165,
-                // Middle C ledger line
-                'C4': -30
+                // Ledger lines above staff (including middle C)
+                'C4': -30, 'B3': -15, 'A3': 0,
+                // Main staff (G3 on top line to A2 on bottom line)
+                'G3': 15, 'F3': 30, 'E3': 45, 'D3': 60, 'C3': 75, 'B2': 90, 'A2': 105,
+                // Ledger lines below staff
+                'G2': 120, 'F2': 135, 'E2': 150, 'D2': 165, 'C2': 180
             }
         };
 
@@ -335,74 +344,43 @@
             'melodic-minor': [0, 2, 3, 5, 7, 9, 11]
         };
 
-        const chordPatterns = {
-            'triads': {
-                'I': [0, 2, 4],
-                'ii': [1, 3, 5],
-                'iii': [2, 4, 6],
-                'IV': [3, 5, 0],
-                'V': [4, 6, 1],
-                'vi': [5, 0, 2],
-                'vii°': [6, 1, 3]
-            },
-            'sevenths': {
-                'IMaj7': [0, 2, 4, 6],
-                'ii7': [1, 3, 5, 0],
-                'iii7': [2, 4, 6, 1],
-                'IVMaj7': [3, 5, 0, 2],
-                'V7': [4, 6, 1, 3],
-                'vi7': [5, 0, 2, 4],
-                'vii°7': [6, 1, 3, 5]
-            }
-        };
-
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        const naturalNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-
+        
         function getNoteFromSemitone(rootIndex, semitone) {
             return noteNames[(rootIndex + semitone) % 12];
+        }
+
+        function getEnharmonicName(note, keySignature) {
+            // Convert sharps to flats based on key signature
+            const enharmonics = {
+                'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb'
+            };
+            
+            // For now, return the note as is - you can add key signature logic here
+            return note;
         }
 
         function clearStaff() {
             document.querySelectorAll('.note').forEach(note => note.remove());
         }
 
-        function addNoteToStaff(staffClass, noteName, octave, position, isChordNote = false) {
-            const staff = document.querySelector(`.${staffClass}`);
+        function addNoteToStaff(staffId, noteName, octave, position, noteIndex) {
+            const staff = document.getElementById(staffId);
             const note = document.createElement('div');
-            note.className = isChordNote ? 'note chord-note' : 'note';
+            note.className = 'note';
             
-            // Position note
-            note.style.top = (20 + position) + 'px';
-            note.style.left = (100 + (document.querySelectorAll('.note').length * 35)) + 'px';
+            // Position note - spread notes across the staff width
+            const startX = 120;
+            const spacing = 60;
+            note.style.top = (40 + position) + 'px';
+            note.style.left = (startX + (noteIndex * spacing)) + 'px';
             
             const nameDiv = document.createElement('div');
             nameDiv.className = 'note-name';
-            nameDiv.textContent = noteName + octave;
+            nameDiv.textContent = noteName;
             note.appendChild(nameDiv);
             
             staff.appendChild(note);
-        }
-
-        function getScaleNotes(rootNote, scaleType) {
-            const rootIndex = noteNames.indexOf(rootNote.replace('b', '#'));
-            const pattern = scalePatterns[scaleType];
-            return pattern.map(semitone => getNoteFromSemitone(rootIndex, semitone));
-        }
-
-        function getNoteWithOctave(noteName, clef, noteIndex) {
-            // Determine appropriate octaves for each clef
-            if (clef === 'treble') {
-                // Treble clef typically shows octaves 4-6
-                if (noteIndex < 3) return noteName + '4';
-                if (noteIndex < 6) return noteName + '5';
-                return noteName + '5';
-            } else {
-                // Bass clef typically shows octaves 2-4
-                if (noteIndex < 3) return noteName + '2';
-                if (noteIndex < 6) return noteName + '3';
-                return noteName + '3';
-            }
         }
 
         function generateScale() {
@@ -412,52 +390,38 @@
             
             clearStaff();
             
-            const scaleNotes = getScaleNotes(rootNote, scaleType);
-            
             if (displayMode === 'scale') {
-                // Display scale notes
-                scaleNotes.forEach((note, index) => {
-                    // Add to treble clef
-                    const trebleNote = getNoteWithOctave(note, 'treble', index);
-                    const trebleOctave = trebleNote.slice(-1);
-                    const treblePosition = notePositions.treble[trebleNote];
-                    
-                    if (treblePosition !== undefined) {
-                        addNoteToStaff('treble-staff', note, trebleOctave, treblePosition);
-                    }
-                    
-                    // Add to bass clef
-                    const bassNote = getNoteWithOctave(note, 'bass', index);
-                    const bassOctave = bassNote.slice(-1);
-                    const bassPosition = notePositions.bass[bassNote];
-                    
-                    if (bassPosition !== undefined) {
-                        addNoteToStaff('bass-staff', note, bassOctave, bassPosition);
-                    }
-                });
-            } else {
-                // Display chords
-                const chordType = displayMode === 'triads' ? 'triads' : 'sevenths';
-                const chords = chordPatterns[chordType];
+                const rootIndex = noteNames.indexOf(rootNote);
+                const pattern = scalePatterns[scaleType];
+                const scaleNotes = pattern.map(semitone => getNoteFromSemitone(rootIndex, semitone));
                 
-                Object.entries(chords).forEach(([chordName, intervals], chordIndex) => {
-                    const chordNotes = intervals.map(interval => scaleNotes[interval]);
+                let noteIndex = 0;
+                
+                // Generate all instances of scale notes across both staves
+                // Treble clef range
+                Object.entries(notePositions.treble).forEach(([noteOctave, position]) => {
+                    const noteName = noteOctave.slice(0, -1);
+                    const octave = noteOctave.slice(-1);
                     
-                    chordNotes.forEach((note, noteIndex) => {
-                        const trebleNote = getNoteWithOctave(note, 'treble', noteIndex);
-                        const trebleOctave = trebleNote.slice(-1);
-                        const treblePosition = notePositions.treble[trebleNote];
-                        
-                        if (treblePosition !== undefined) {
-                            // Stack chord notes vertically
-                            const stackedPosition = treblePosition + (noteIndex * 15);
-                            addNoteToStaff('treble-staff', note, trebleOctave, stackedPosition, true);
-                        }
-                    });
+                    if (scaleNotes.includes(noteName)) {
+                        addNoteToStaff('trebleStaff', noteName + octave, octave, position, noteIndex);
+                        noteIndex++;
+                    }
                 });
+                
+                // Bass clef range
+                Object.entries(notePositions.bass).forEach(([noteOctave, position]) => {
+                    const noteName = noteOctave.slice(0, -1);
+                    const octave = noteOctave.slice(-1);
+                    
+                    if (scaleNotes.includes(noteName)) {
+                        addNoteToStaff('bassStaff', noteName + octave, octave, position, noteIndex);
+                        noteIndex++;
+                    }
+                });
+                
+                updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode);
             }
-            
-            updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode);
         }
 
         function updateInfoPanel(rootNote, scaleType, scaleNotes, displayMode) {
@@ -479,20 +443,10 @@
             
             if (displayMode === 'scale') {
                 chordInfo.innerHTML = `
-                    <strong>Scale Degrees:</strong><br>
-                    I: ${scaleNotes[0]} (Tonic)<br>
-                    II: ${scaleNotes[1]} (Supertonic)<br>
-                    III: ${scaleNotes[2]} (Mediant)<br>
-                    IV: ${scaleNotes[3]} (Subdominant)<br>
-                    V: ${scaleNotes[4]} (Dominant)<br>
-                    VI: ${scaleNotes[5]} (Submediant)<br>
-                    VII: ${scaleNotes[6]} (Leading Tone)
-                `;
-            } else {
-                const chordType = displayMode === 'triads' ? 'Basic Triads' : 'Seventh Chords';
-                chordInfo.innerHTML = `
-                    <strong>${chordType} in ${rootNote} ${scaleType}:</strong><br>
-                    Chords are stacked vertically showing traditional chord voicings.
+                    <strong>All instances of scale notes displayed across full range:</strong><br>
+                    Treble Clef: A3 to C6<br>
+                    Bass Clef: C2 to C4<br>
+                    Every occurrence of ${scaleNotes.join(', ')} is shown on both staves.
                 `;
             }
         }
