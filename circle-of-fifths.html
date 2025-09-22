@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle of Fifths - Music Theory Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 600px 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .circle-of-fifths {
+            width: 500px;
+            height: 500px;
+            position: relative;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        .key-segment {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(145deg, #f0f0f0, #d0d0d0);
+            border: 2px solid #333;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .key-segment:hover {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .major-key {
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .minor-key {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(145deg, #333, #555);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 300px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip h4 {
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+
+        .theory-section {
+            margin-bottom: 2rem;
+        }
+
+        .theory-section h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .theory-section p, .theory-section li {
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .theory-section ul {
+            margin-left: 1.5rem;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .chord-progression {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .circle-of-fifths {
+                width: 400px;
+                height: 400px;
+            }
+            
+            .key-segment {
+                width: 70px;
+                height: 35px;
+                font-size: 0.8rem;
+            }
+            
+            .center-circle {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .circle-of-fifths {
+                width: 350px;
+                height: 350px;
+            }
+            
+            .key-segment {
+                width: 60px;
+                height: 30px;
+                font-size: 0.7rem;
+            }
+            
+            .center-circle {
+                width: 80px;
+                height: 80px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Hub</a>
+    
+    <div class="header">
+        <h1>🎵 Circle of Fifths</h1>
+        <p>Interactive music theory tool for understanding key relationships</p>
+    </div>
+
+    <div class="main-container">
+        <!-- Left Info Panel -->
+        <div class="info-panel">
+            <div class="theory-section">
+                <h3>🎼 What is the Circle of Fifths?</h3>
+                <p>The Circle of Fifths is a visual representation of key signatures and their relationships. Moving clockwise, each key is a perfect fifth higher than the previous one.</p>
+                
+                <div class="highlight">
+                    <strong>Perfect Fifth Interval:</strong> 7 semitones (C to G, G to D, etc.)
+                </div>
+            </div>
+
+            <div class="theory-section">
+                <h3>🔍 How to Use</h3>
+                <ul>
+                    <li><strong>Hover</strong> over any key to see detailed information</li>
+                    <li><strong>Clockwise:</strong> Each step adds one sharp</li>
+                    <li><strong>Counterclockwise:</strong> Each step adds one flat</li>
+                    <li><strong>Inner circle:</strong> Relative minor keys</li>
+                    <li><strong>Outer circle:</strong> Major keys</li>
+                </ul>
+            </div>
+
+            <div class="theory-section">
+                <h3>🎹 Key Relationships</h3>
+                <p><strong>Adjacent Keys:</strong> Share most notes in common</p>
+                <p><strong>Opposite Keys:</strong> Share the fewest notes</p>
+                <p><strong>Relative Major/Minor:</strong> Share the same key signature</p>
+                
+                <div class="chord-progression">
+                    Example: C Major → G Major → D Major
+                    (Adding sharps: F♯, then C♯)
+                </div>
+            </div>
+        </div>
+
+        <!-- Circle Container -->
+        <div class="circle-container">
+            <div class="circle-of-fifths" id="circleOfFifths">
+                <div class="center-circle">
+                    <div>Circle</div>
+                    <div>of</div>
+                    <div>Fifths</div>
+                </div>
+            </div>
+            
+            <div class="tooltip" id="tooltip">
+                <h4 id="tooltipTitle"></h4>
+                <div id="tooltipContent"></div>
+            </div>
+        </div>
+
+        <!-- Right Info Panel -->
+        <div class="info-panel">
+            <div class="theory-section">
+                <h3>🎵 Chord Progressions</h3>
+                <p>The Circle helps you find common chord progressions:</p>
+                
+                <div class="chord-progression">
+                    <strong>I-V-vi-IV:</strong> Very popular progression<br>
+                    C Major: C - G - Am - F
+                </div>
+                
+                <div class="chord-progression">
+                    <strong>ii-V-I:</strong> Jazz standard<br>
+                    C Major: Dm - G - C
+                </div>
+                
+                <div class="chord-progression">
+                    <strong>vi-IV-I-V:</strong> Pop progression<br>
+                    C Major: Am - F - C - G
+                </div>
+            </div>
+
+            <div class="theory-section">
+                <h3>🎼 Modulation</h3>
+                <p>The Circle shows the easiest keys to modulate to:</p>
+                <ul>
+                    <li><strong>Closely related keys:</strong> Adjacent on the circle</li>
+                    <li><strong>Relative major/minor:</strong> Same key signature</li>
+                    <li><strong>Dominant key:</strong> One step clockwise</li>
+                    <li><strong>Subdominant key:</strong> One step counterclockwise</li>
+                </ul>
+            </div>
+
+            <div class="theory-section">
+                <h3>🎯 Memory Tips</h3>
+                <ul>
+                    <li><strong>Sharps:</strong> "Father Charles Goes Down And Ends Battle"</li>
+                    <li><strong>Flats:</strong> "Battle Ends And Down Goes Charles's Father"</li>
+                    <li><strong>Order of sharps:</strong> F♯ C♯ G♯ D♯ A♯ E♯ B♯</li>
+                    <li><strong>Order of flats:</strong> B♭ E♭ A♭ D♭ G♭ C♭ F♭</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete key data with all music theory information
+        const keyData = {
+            'C': {
+                major: 'C Major',
+                minor: 'A minor',
+                sharps: 0,
+                flats: 0,
+                keySignature: 'No sharps or flats',
+                majorScale: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+                minorScale: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+                majorTriads: ['C', 'Dm', 'Em', 'F', 'G', 'Am', 'B°'],
+                dominantOf: 'F Major',
+                subdominantOf: 'G Major',
+                relativeMinor: 'A minor',
+                parallelMinor: 'C minor',
+                commonProgressions: ['I-V-vi-IV: C-G-Am-F', 'vi-IV-I-V: Am-F-C-G']
+            },
+            'G': {
+                major: 'G Major',
+                minor: 'E minor',
+                sharps: 1,
+                flats: 0,
+                keySignature: '1 sharp (F♯)',
+                majorScale: ['G', 'A', 'B', 'C', 'D', 'E', 'F♯'],
+                minorScale: ['E', 'F♯', 'G', 'A', 'B', 'C', 'D'],
+                majorTriads: ['G', 'Am', 'Bm', 'C', 'D', 'Em', 'F♯°'],
+                dominantOf: 'C Major',
+                subdominantOf: 'D Major',
+                relativeMinor: 'E minor',
+                parallelMinor: 'G minor',
+                commonProgressions: ['I-V-vi-IV: G-D-Em-C', 'ii-V-I: Am-D-G']
+            },
+            'D': {
+                major: 'D Major',
+                minor: 'B minor',
+                sharps: 2,
+                flats: 0,
+                keySignature: '2 sharps (F♯, C♯)',
+                majorScale: ['D', 'E', 'F♯', 'G', 'A', 'B', 'C♯'],
+                minorScale: ['B', 'C♯', 'D', 'E', 'F♯', 'G', 'A'],
+                majorTriads: ['D', 'Em', 'F♯m', 'G', 'A', 'Bm', 'C♯°'],
+                dominantOf: 'G Major',
+                subdominantOf: 'A Major',
+                relativeMinor: 'B minor',
+                parallelMinor: 'D minor',
+                commonProgressions: ['I-V-vi-IV: D-A-Bm-G', 'I-vi-ii-V: D-Bm-Em-A']
+            },
+            'A': {
+                major: 'A Major',
+                minor: 'F♯ minor',
+                sharps: 3,
+                flats: 0,
+                keySignature: '3 sharps (F♯, C♯, G♯)',
+                majorScale: ['A', 'B', 'C♯', 'D', 'E', 'F♯', 'G♯'],
+                minorScale: ['F♯', 'G♯', 'A', 'B', 'C♯', 'D', 'E'],
+                majorTriads: ['A', 'Bm', 'C♯m', 'D', 'E', 'F♯m', 'G♯°'],
+                dominantOf: 'D Major',
+                subdominantOf: 'E Major',
+                relativeMinor: 'F♯ minor',
+                parallelMinor: 'A minor',
+                commonProgressions: ['I-V-vi-IV: A-E-F♯m-D', 'vi-IV-I-V: F♯m-D-A-E']
+            },
+            'E': {
+                major: 'E Major',
+                minor: 'C♯ minor',
+                sharps: 4,
+                flats: 0,
+                keySignature: '4 sharps (F♯, C♯, G♯, D♯)',
+                majorScale: ['E', 'F♯', 'G♯', 'A', 'B', 'C♯', 'D♯'],
+                minorScale: ['C♯', 'D♯', 'E', 'F♯', 'G♯', 'A', 'B'],
+                majorTriads: ['E', 'F♯m', 'G♯m', 'A', 'B', 'C♯m', 'D♯°'],
+                dominantOf: 'A Major',
+                subdominantOf: 'B Major',
+                relativeMinor: 'C♯ minor',
+                parallelMinor: 'E minor',
+                commonProgressions: ['I-V-vi-IV: E-B-C♯m-A', 'ii-V-I: F♯m-B-E']
+            },
+            'B': {
+                major: 'B Major',
+                minor: 'G♯ minor',
+                sharps: 5,
+                flats: 0,
+                keySignature: '5 sharps (F♯, C♯, G♯, D♯, A♯)',
+                majorScale: ['B', 'C♯', 'D♯', 'E', 'F♯', 'G♯', 'A♯'],
+                minorScale: ['G♯', 'A♯', 'B', 'C♯', 'D♯', 'E', 'F♯'],
+                majorTriads: ['B', 'C♯m', 'D♯m', 'E', 'F♯', 'G♯m', 'A♯°'],
+                dominantOf: 'E Major',
+                subdominantOf: 'F♯ Major',
+                relativeMinor: 'G♯ minor',
+                parallelMinor: 'B minor',
+                commonProgressions: ['I-V-vi-IV: B-F♯-G♯m-E', 'I-vi-IV-V: B-G♯m-E-F♯']
+            },
+            'F♯': {
+                major: 'F♯ Major',
+                minor: 'D♯ minor',
+                sharps: 6,
+                flats: 0,
+                keySignature: '6 sharps (F♯, C♯, G♯, D♯, A♯, E♯)',
+                majorScale: ['F♯', 'G♯', 'A♯', 'B', 'C♯', 'D♯', 'E♯'],
+                minorScale: ['D♯', 'E♯', 'F♯', 'G♯', 'A♯', 'B', 'C♯'],
+                majorTriads: ['F♯', 'G♯m', 'A♯m', 'B', 'C♯', 'D♯m', 'E♯°'],
+                dominantOf: 'B Major',
+                subdominantOf: 'C♯ Major',
+                relativeMinor: 'D♯ minor',
+                parallelMinor: 'F♯ minor',
+                commonProgressions: ['I-V-vi-IV: F♯-C♯-D♯m-B', 'ii-V-I: G♯m-C♯-F♯']
+            },
+            'F': {
+                major: 'F Major',
+                minor: 'D minor',
+                sharps: 0,
+                flats: 1,
+                keySignature: '1 flat (B♭)',
+                majorScale: ['F', 'G', 'A', 'B♭', 'C', 'D', 'E'],
+                minorScale: ['D', 'E', 'F', 'G', 'A', 'B♭', 'C'],
+                majorTriads: ['F', 'Gm', 'Am', 'B♭', 'C', 'Dm', 'E°'],
+                dominantOf: 'B♭ Major',
+                subdominantOf: 'C Major',
+                relativeMinor: 'D minor',
+                parallelMinor: 'F minor',
+                commonProgressions: ['I-V-vi-IV: F-C-Dm-B♭', 'vi-IV-I-V: Dm-B♭-F-C']
+            },
+            'B♭': {
+                major: 'B♭ Major',
+                minor: 'G minor',
+                sharps: 0,
+                flats: 2,
+                keySignature: '2 flats (B♭, E♭)',
+                majorScale: ['B♭', 'C', 'D', 'E♭', 'F', 'G', 'A'],
+                minorScale: ['G', 'A', 'B♭', 'C', 'D', 'E♭', 'F'],
+                majorTriads: ['B♭', 'Cm', 'Dm', 'E♭', 'F', 'Gm', 'A°'],
+                dominantOf: 'E♭ Major',
+                subdominantOf: 'F Major',
+                relativeMinor: 'G minor',
+                parallelMinor: 'B♭ minor',
+                commonProgressions: ['I-V-vi-IV: B♭-F-Gm-E♭', 'ii-V-I: Cm-F-B♭']
+            },
+            'E♭': {
+                major: 'E♭ Major',
+                minor: 'C minor',
+                sharps: 0,
+                flats: 3,
+                keySignature: '3 flats (B♭, E♭, A♭)',
+                majorScale: ['E♭', 'F', 'G', 'A♭', 'B♭', 'C', 'D'],
+                minorScale: ['C', 'D', 'E♭', 'F', 'G', 'A♭', 'B♭'],
+                majorTriads: ['E♭', 'Fm', 'Gm', 'A♭', 'B♭', 'Cm', 'D°'],
+                dominantOf: 'A♭ Major',
+                subdominantOf: 'B♭ Major',
+                relativeMinor: 'C minor',
+                parallelMinor: 'E♭ minor',
+                commonProgressions: ['I-V-vi-IV: E♭-B♭-Cm-A♭', 'vi-IV-I-V: Cm-A♭-E♭-B♭']
+            },
+            'A♭': {
+                major: 'A♭ Major',
+                minor: 'F minor',
+                sharps: 0,
+                flats: 4,
+                keySignature: '4 flats (B♭, E♭, A♭, D♭)',
+                majorScale: ['A♭', 'B♭', 'C', 'D♭', 'E♭', 'F', 'G'],
+                minorScale: ['F', 'G', 'A♭', 'B♭', 'C', 'D♭', 'E♭'],
+                majorTriads: ['A♭', 'B♭m', 'Cm', 'D♭', 'E♭', 'Fm', 'G°'],
+                dominantOf: 'D♭ Major',
+                subdominantOf: 'E♭ Major',
+                relativeMinor: 'F minor',
+                parallelMinor: 'A♭ minor',
+                commonProgressions: ['I-V-vi-IV: A♭-E♭-Fm-D♭', 'I-vi-ii-V: A♭-Fm-B♭m-E♭']
+            },
+            'D♭': {
+                major: 'D♭ Major',
+                minor: 'B♭ minor',
+                sharps: 0,
+                flats: 5,
+                keySignature: '5 flats (B♭, E♭, A♭, D♭, G♭)',
+                majorScale: ['D♭', 'E♭', 'F', 'G♭', 'A♭', 'B♭', 'C'],
+                minorScale: ['B♭', 'C', 'D♭', 'E♭', 'F', 'G♭', 'A♭'],
+                majorTriads: ['D♭', 'E♭m', 'Fm', 'G♭', 'A♭', 'B♭m', 'C°'],
+                dominantOf: 'G♭ Major',
+                subdominantOf: 'A♭ Major',
+                relativeMinor: 'B♭ minor',
+                parallelMinor: 'D♭ minor',
+                commonProgressions: ['I-V-vi-IV: D♭-A♭-B♭m-G♭', 'ii-V-I: E♭m-A♭-D♭']
+            }
+        };
+
+        // Positions for each key segment (in degrees, converted to radians)
+        const keyPositions = [
+            { key: 'C', angle: -90 },      // 12 o'clock
+            { key: 'G', angle: -60 },      // 1 o'clock
+            { key: 'D', angle: -30 },      // 2 o'clock
+            { key: 'A', angle: 0 },        // 3 o'clock
+            { key: 'E', angle: 30 },       // 4 o'clock
+            { key: 'B', angle: 60 },       // 5 o'clock
+            { key: 'F♯', angle: 90 },      // 6 o'clock
+            { key: 'D♭', angle: 120 },     // 7 o'clock
+            { key: 'A♭', angle: 150 },     // 8 o'clock
+            { key: 'E♭', angle: 180 },     // 9 o'clock
+            { key: 'B♭', angle: -150 },    // 10 o'clock
+            { key: 'F', angle: -120 }      // 11 o'clock
+        ];
+
+        function createCircle() {
+            const circle = document.getElementById('circleOfFifths');
+            const centerX = 250;
+            const centerY = 250;
+            const radius = 180;
+
+            keyPositions.forEach(position => {
+                const segment = document.createElement('div');
+                segment.className = 'key-segment';
+                
+                // Calculate position
+                const radian = (position.angle * Math.PI) / 180;
+                const x = centerX + radius * Math.cos(radian) - 40; // -40 to center the 80px wide segment
+                const y = centerY + radius * Math.sin(radian) - 20; // -20 to center the 40px high segment
+                
+                segment.style.left = x + 'px';
+                segment.style.top = y + 'px';
+                
+                // Add content
+                const data = keyData[position.key];
+                segment.innerHTML = `
+                    <div class="major-key">${data.major.split(' ')[0]}</div>
+                    <div class="minor-key">${data.minor.split(' ')[0]}</div>
+                `;
+                
+                // Add hover events
+                segment.addEventListener('mouseenter', (e) => showTooltip(e, position.key));
+                segment.addEventListener('mouseleave', hideTooltip);
+                segment.addEventListener('mousemove', (e) => updateTooltipPosition(e));
+                
+                circle.appendChild(segment);
+            });
+        }
+
+        function showTooltip(event, key) {
+            const tooltip = document.getElementById('tooltip');
+            const data = keyData[key];
+            
+            document.getElementById('tooltipTitle').textContent = `${data.major} / ${data.minor}`;
+            
+            document.getElementById('tooltipContent').innerHTML = `
+                <p><strong>Key Signature:</strong> ${data.keySignature}</p>
+                <p><strong>Major Scale:</strong> ${data.majorScale.join(' - ')}</p>
+                <p><strong>Minor Scale:</strong> ${data.minorScale.join(' - ')}</p>
+                <p><strong>Major Triads:</strong> ${data.majorTriads.join(' - ')}</p>
+                <p><strong>Relationships:</strong></p>
+                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                    <li>Dominant of: ${data.dominantOf}</li>
+                    <li>Subdominant of: ${data.subdominantOf}</li>
+                    <li>Relative minor: ${data.relativeMinor}</li>
+                    <li>Parallel minor: ${data.parallelMinor}</li>
+                </ul>
+                <p><strong>Common Progressions:</strong></p>
+                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                    ${data.commonProgressions.map(prog => `<li>${prog}</li>`).join('')}
+                </ul>
+            `;
+            
+            tooltip.classList.add('show');
+            updateTooltipPosition(event);
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.classList.remove('show');
+        }
+
+        function updateTooltipPosition(event) {
+            const tooltip = document.getElementById('tooltip');
+            const rect = tooltip.getBoundingClientRect();
+            
+            let x = event.pageX + 10;
+            let y = event.pageY - 10;
+            
+            // Keep tooltip on screen
+            if (x + rect.width > window.innerWidth) {
+                x = event.pageX - rect.width - 10;
+            }
+            if (y < 0) {
+                y = event.pageY + 10;
+            }
+            
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        // Initialize the circle when page loads
+        document.addEventListener('DOMContentLoaded', createCircle);
+    </script>
+</body>
+</html>
