@@ -134,7 +134,7 @@
         }
 
         .tooltip {
-            position: absolute;
+            position: fixed;
             background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 1rem;
@@ -609,19 +609,37 @@
 
         function updateTooltipPosition(event) {
             const tooltip = document.getElementById('tooltip');
-            const rect = tooltip.getBoundingClientRect();
             
-            let x = event.pageX + 10;
-            let y = event.pageY - 10;
+            // Use clientX/clientY for viewport-relative positioning
+            let x = event.clientX + 15;
+            let y = event.clientY - 15;
             
-            // Keep tooltip on screen
-            if (x + rect.width > window.innerWidth) {
-                x = event.pageX - rect.width - 10;
+            // Get tooltip dimensions (might be 0 if not visible yet)
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const tooltipWidth = tooltipRect.width || 300; // fallback width
+            const tooltipHeight = tooltipRect.height || 200; // fallback height
+            
+            // Keep tooltip on screen - check right edge
+            if (x + tooltipWidth > window.innerWidth) {
+                x = event.clientX - tooltipWidth - 15;
             }
+            
+            // Keep tooltip on screen - check bottom edge
+            if (y + tooltipHeight > window.innerHeight) {
+                y = event.clientY - tooltipHeight - 15;
+            }
+            
+            // Keep tooltip on screen - check top edge
             if (y < 0) {
-                y = event.pageY + 10;
+                y = event.clientY + 15;
             }
             
+            // Keep tooltip on screen - check left edge
+            if (x < 0) {
+                x = 15;
+            }
+            
+            tooltip.style.position = 'fixed';
             tooltip.style.left = x + 'px';
             tooltip.style.top = y + 'px';
         }
