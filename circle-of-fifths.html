@@ -135,17 +135,18 @@
 
         .tooltip {
             position: fixed;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             color: white;
             padding: 1rem;
             border-radius: 8px;
             font-size: 0.9rem;
             max-width: 300px;
-            z-index: 9999;
+            z-index: 99999;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .tooltip.show {
@@ -287,11 +288,6 @@
                     <div>Fifths</div>
                 </div>
             </div>
-            
-            <div class="tooltip" id="tooltip">
-                <h4 id="tooltipTitle"></h4>
-                <div id="tooltipContent"></div>
-            </div>
         </div>
 
         <!-- Right Info Panel -->
@@ -337,6 +333,12 @@
                 </ul>
             </div>
         </div>
+    </div>
+
+    <!-- Tooltip positioned at body level to ensure it's on top -->
+    <div class="tooltip" id="tooltip">
+        <h4 id="tooltipTitle"></h4>
+        <div id="tooltipContent"></div>
     </div>
 
     <script>
